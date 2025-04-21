@@ -1,0 +1,44 @@
+#include <SPI.h> // enable communication with Serial Peripheral Interface (SPI) devices
+#include <SD.h> //  interface with the microSD card
+
+const int chipSelect = D8; // CS pin on D8
+
+void setup() {
+  Serial.begin(9600);
+  //Initialize SD Card:
+  if (!SD.begin(chipSelect)) {
+    Serial.println("SD Card initialization failed!");
+    return;
+  }
+  Serial.println("SD Card initialized.");
+
+  // Remove the old file (if it exists)
+  if (SD.exists("/test.txt")) {
+    SD.remove("/test.txt");
+    Serial.println("Old file removed.");
+  }
+
+  // Create & write a new file
+  File myFile = SD.open("/test.txt", FILE_WRITE);
+  if (myFile) {
+    myFile.println("Hello, WeMos & SD Card!");
+    myFile.close();
+    Serial.println("File written.");
+  } else {
+    Serial.println("Error opening file!");
+  }
+
+  // Read the file
+  myFile = SD.open("/test.txt");
+  if (myFile) {
+    Serial.println("File content:");
+    while (myFile.available()) {
+      Serial.write(myFile.read());
+    }
+    myFile.close();
+  } else {
+    Serial.println("Error opening file for reading!");
+  }
+}
+
+void loop() {}
